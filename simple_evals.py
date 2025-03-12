@@ -16,7 +16,8 @@ from .sampler.chat_completion_sampler import (
 )
 from .sampler.o_chat_completion_sampler import OChatCompletionSampler
 from .sampler.claude_sampler import ClaudeCompletionSampler, CLAUDE_SYSTEM_MESSAGE_LMSYS
-
+from .sampler.ubicloud_sampler import UbicloudCompletionSampler
+from .sampler.deep_research_sampler import DeepRsearchCompletionSampler
 
 def main():
     parser = argparse.ArgumentParser(
@@ -99,6 +100,19 @@ def main():
             model="claude-3-opus-20240229",
             system_message=CLAUDE_SYSTEM_MESSAGE_LMSYS,
         ),
+        # ubicloud models:
+        "llama-3-3-70b-turbo": UbicloudCompletionSampler(
+            model="llama-3-3-70b-turbo"
+        ),
+        "deep-research-1": DeepRsearchCompletionSampler(
+            depth=1
+        ), 
+        "deep-research-2": DeepRsearchCompletionSampler(
+            depth=2
+        ), 
+        "deep-research-3": DeepRsearchCompletionSampler(
+            depth=3
+        ), 
     }
 
     if args.list_models:
@@ -113,7 +127,7 @@ def main():
             return
         models = {args.model: models[args.model]}
 
-    grading_sampler = ChatCompletionSampler(model="gpt-4o")
+    grading_sampler = UbicloudCompletionSampler(model="llama-3-3-70b-turbo")
     equality_checker = ChatCompletionSampler(model="gpt-4-turbo-preview")
     # ^^^ used for fuzzy matching, just for math
 
@@ -154,7 +168,8 @@ def main():
 
     evals = {
         eval_name: get_evals(eval_name, args.debug)
-        for eval_name in ["simpleqa", "mmlu", "math", "gpqa", "mgsm", "drop", "humaneval"]
+        # for eval_name in ["simpleqa", "mmlu", "math", "gpqa", "mgsm", "drop", "humaneval"]
+        for eval_name in ["simpleqa"]
     }
     print(evals)
     debug_suffix = "_DEBUG" if args.debug else ""

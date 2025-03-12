@@ -7,6 +7,8 @@ https://cdn.openai.com/papers/simpleqa.pdf
 import random 
 import re
 import pandas
+import requests
+from io import StringIO
 from . import common
 from .types import Eval, EvalResult, SamplerBase, SingleEvalResult
 
@@ -98,9 +100,17 @@ CHOICE_LETTER_TO_STRING = dict(zip(CHOICE_LETTERS, CHOICE_STRINGS))
 
 class SimpleQAEval(Eval):
     def __init__(self, grader_model: SamplerBase, num_examples: int | None = None, n_repeats: int = 1):
-        df = pandas.read_csv(
-            f"https://openaipublic.blob.core.windows.net/simple-evals/simple_qa_test_set.csv"
-        )
+        # df = pandas.read_csv(
+        #     f"https://openaipublic.blob.core.windows.net/simple-evals/simple_qa_test_set.csv",
+        #     storage_options={'http_timeout': 60}
+        # )
+        url = "https://openaipublic.blob.core.windows.net/simple-evals/simple_qa_test_set.csv"
+        response = requests.get(url, timeout=60)
+        response.raise_for_status()  # Raise an error on a bad status
+
+        # Use StringIO to simulate a file for pandas
+        data = StringIO(response.text)
+        df = pandas.read_csv(data)
         examples = [row.to_dict() for _, row in df.iterrows()]
         if num_examples:
             assert n_repeats == 1, "n_repeats only supported when max_examples = None"

@@ -258,7 +258,8 @@ def deep_dive(state: ResearchState, search_engine: str) -> ResearchState:
         create_system_message("""
 Identify 3 key areas for deeper exploration on the given topic and thinking.
 Return a JSON array of strings.
-Each string should be a well-structured search engine query."""),
+Each string should be a well-structured search engine query.
+At least one of them should explicitly ask for wiki sources."""),
         create_user_message({
             "topic": state["topic"],
             "thinking": state.get("thinking", "")

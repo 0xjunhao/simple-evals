@@ -245,7 +245,7 @@ def thinking(state: ResearchState) -> ResearchState:
     thinking = inference([
         create_system_message("""
 Take a deep breath, go through the search results, think through the topic step by step, and provide a well-reasoned answer.
-Use information from the search results as needed, prioritizing trustworthy sources such as Wikipedia."""),
+Use information from the search results as needed, prioritizing trustworthy sources such as Wikipedia. Ignore unrelated or unreliable sources."""),
                             #   Be objective, reasonable, and comprehensive."""),
         create_user_message(state)
     ], mode=InferenceMode.REASONING)

@@ -299,7 +299,7 @@ def write_answer(state: ResearchState) -> ResearchState:
     state.pop("report", None)
     outline = inference([
         create_system_message("""
-Using the provided topic, search results, and thinking, generate a clear, accurate, and concise answer for the topic question."""),
+Using the provided topic question, search results, and thinking, generate a clear, accurate, and concise answer for the topic question."""),
         create_user_message(state)
     ], InferenceMode.REASONING)
     return {**state, "answer": outline}

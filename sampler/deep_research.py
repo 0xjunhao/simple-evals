@@ -309,8 +309,8 @@ For example:
 What is the month, day, and year that ChatGPT is initially released?
 Answer: November, 30, 2022
 
-Who was the CEO of OpenAI when ChatGPT was initially released?
-Answer: Sam Altman
+Who was the other founder of Google besides Larry Page?
+Answer: Sergey Brin
 """),
         create_user_message(state)
     ], InferenceMode.REASONING)

@@ -104,7 +104,7 @@ def main():
         "llama-3-3-70b-turbo": UbicloudCompletionSampler(
             model="llama-3-3-70b-turbo"
         ),
-        "deep-research-1": DeepRsearchCompletionSampler(
+        "deep-research-0": DeepRsearchCompletionSampler(
             depth=0
         ), 
         "deep-research-1": DeepRsearchCompletionSampler(

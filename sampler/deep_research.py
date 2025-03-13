@@ -28,7 +28,7 @@ UBICLOUD_API_KEY = os.getenv("UBICLOUD_API_KEY")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 # Model configurations
-SUMMARIZATION_MODEL = "mistral-small-3"
+SUMMARIZATION_MODEL = ""
 SUMMARIZATION_CONTENT_CUTOFF = 50000
 REASONING_MODEL = "ds-r1-qwen-32b"
 WRITING_MODEL = "mistral-small-3"
@@ -256,7 +256,7 @@ def deep_dive(state: ResearchState, search_engine: str) -> ResearchState:
     """Deep dive into a few areas."""
     subtopics = inference([
         create_system_message("""
-Identify 3 key areas for further exploration or verification on the given topic.
+Identify 2 key areas for further exploration or verification on the given topic.
 Return a JSON array of strings.
 Each string should be a well-structured search engine query.
 At least one of them should explicitly ask for wiki sources."""),

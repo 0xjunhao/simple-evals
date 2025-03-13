@@ -105,6 +105,9 @@ def main():
             model="llama-3-3-70b-turbo"
         ),
         "deep-research-1": DeepRsearchCompletionSampler(
+            depth=0
+        ), 
+        "deep-research-1": DeepRsearchCompletionSampler(
             depth=1
         ), 
         "deep-research-2": DeepRsearchCompletionSampler(

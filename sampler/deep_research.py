@@ -28,10 +28,10 @@ UBICLOUD_API_KEY = os.getenv("UBICLOUD_API_KEY")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 # Model configurations
-SUMMARIZATION_MODEL = ""
+SUMMARIZATION_MODEL = "ds-r1-qwen-32b"
 SUMMARIZATION_CONTENT_CUTOFF = 50000
 REASONING_MODEL = "ds-r1-qwen-32b"
-WRITING_MODEL = "mistral-small-3"
+WRITING_MODEL = "ds-r1-qwen-32b"
 JSON_MODEL = "ds-r1-qwen-32b"
 
 

@@ -371,7 +371,7 @@ def deep_research(topic: str, depth: int, search_engine: str, initial_state: Opt
     state = gather_information(topic, state, search_engine)
     state = thinking(state)
     # save_state_json(topic, state, timestamp)
-    for _ in range(depth - 1):
+    for _ in range(depth):
         state = deep_dive(state, search_engine)
         state = thinking(state)
         # save_state_json(topic, state, timestamp)

@@ -199,7 +199,7 @@ def fetch_and_summarize(topic: str, search_result: Dict[str, Any]) -> Optional[s
     if not content:
         logger.warning(f"No content fetched from URL: {url}")
         return None
-    return summarize(title, content)
+    return summarize(topic, content)
 
 
 def gather_information(topic: str, state: ResearchState, search_engine: str) -> ResearchState:

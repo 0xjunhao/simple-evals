@@ -64,7 +64,7 @@ class DeepRsearchCompletionSampler(SamplerBase):
             try:
                 print("message_list", message_list)
                 return deep_research.deep_research(
-                    message_list[0]["content"], depth=self.depth, search_engine="tavily", initial_state=None)
+                    message_list[0]["content"], depth=self.depth, search_engine="tavily", initial_state=None, debug=False)
             # NOTE: BadRequestError is triggered once for MMMU, please uncomment if you are reruning MMMU
             except openai.BadRequestError as e:
                 print("Bad Request Error", e)

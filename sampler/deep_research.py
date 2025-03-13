@@ -256,8 +256,7 @@ def deep_dive(state: ResearchState, search_engine: str) -> ResearchState:
     """Deep dive into a few areas."""
     subtopics = inference([
         create_system_message("""
-Identify 3 key areas for deeper exploration on the given topic.
-Pay attention to areas that may be missing or incorrect from the thinking.
+Identify 3 key areas for further exploration or verification on the given topic.
 Return a JSON array of strings.
 Each string should be a well-structured search engine query.
 At least one of them should explicitly ask for wiki sources."""),

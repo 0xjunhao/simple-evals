@@ -426,8 +426,8 @@ def main() -> None:
             logger.error(
                 f"Failed to load resume state from {args.resume}: {e}")
 
-    deep_research(args.topic, args.depth, args.search_engine, initial_state, args.debug)
-
+    answer = deep_research(args.topic, args.depth, args.search_engine, initial_state, args.debug)
+    logger.info(f"Answer: {answer}")
 
 if __name__ == "__main__":
     main()

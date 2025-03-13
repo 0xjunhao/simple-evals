@@ -175,15 +175,21 @@ class ResearchState(TypedDict):
 def summarize(title: str, content: str) -> Optional[str]:
     """Summarize the given content based on the provided title."""
     try:
-        return inference([
-            create_system_message("""Summarize the content.
-Only include information that is relevant to the title.
-Be succinct. Summarize directly, don't repeat the title."""),
-            create_user_message({
-                "title": title,
-                "content": content[:SUMMARIZATION_CONTENT_CUTOFF]
-            })
-        ], mode=InferenceMode.SUMMARIZATION)
+        cutoff = SUMMARIZATION_CONTENT_CUTOFF
+        chunks = [content[i:i+cutoff] for i in range(0, len(content), cutoff)]
+        summaries = []
+        for chunk in chunks:
+            summary = inference([
+                create_system_message("""Summarize the content.
+    Only include information that is relevant to the title.
+    Be succinct. Summarize directly, don't repeat the title."""),
+                create_user_message({
+                    "title": title,
+                    "content": chunk
+                })
+            ], mode=InferenceMode.SUMMARIZATION)
+            summaries.append(summary)
+        return "\n\n".join(summaries)
     except Exception as e:
         logger.error(f"Error summarizing title '{title}': {e}")
         return None
@@ -245,7 +251,7 @@ def thinking(state: ResearchState) -> ResearchState:
     thinking = inference([
         create_system_message("""
 Take a deep breath, go through the search results, think through the topic step by step, and provide a well-reasoned answer.
-Use information from the search results as needed, prioritizing trustworthy sources such as Wikipedia. Ignore unrelated or unreliable sources."""),
+Use information from the search results as needed, prioritizing trustworthy sources, such as wiki, gov, bookforum, or fandom. Ignore unrelated or unreliable sources."""),
                             #   Be objective, reasonable, and comprehensive."""),
         create_user_message(state)
     ], mode=InferenceMode.REASONING)
@@ -256,10 +262,10 @@ def deep_dive(state: ResearchState, search_engine: str) -> ResearchState:
     """Deep dive into a few areas."""
     subtopics = inference([
         create_system_message("""
-Identify 2 key areas for further exploration or verification on the given topic.
+Generate 1 to 2 search queries on the given topic.
 Return a JSON array of strings.
 Each string should be a well-structured search engine query.
-At least one of them should explicitly ask for wiki sources."""),
+At least one of them should explicitly ask for trustworthy sources, such as wiki, gov, bookforum, or fandom."""),
         create_user_message({
             "topic": state["topic"],
             "thinking": state.get("thinking", "")
@@ -298,7 +304,14 @@ def write_answer(state: ResearchState) -> ResearchState:
     state.pop("report", None)
     outline = inference([
         create_system_message("""
-Using the provided topic question, search results, and thinking, generate a clear, accurate, and concise answer for the topic question."""),
+Using the provided topic question, search results, and thinking, generate a clear, accurate, and concise answer for the topic question.
+For example:
+What is the month, day, and year that ChatGPT is initially released?
+Answer: November, 30, 2022
+
+Who was the CEO of OpenAI when ChatGPT was initially released?
+Answer: Sam Altman
+"""),
         create_user_message(state)
     ], InferenceMode.REASONING)
     return {**state, "answer": outline}
@@ -363,20 +376,24 @@ def save_state_json(topic: str, state: dict, timestamp: str) -> None:
     logger.info(f"Saved state JSON: {filename}")
 
 
-def deep_research(topic: str, depth: int, search_engine: str, initial_state: Optional[dict]) -> None:
+def deep_research(
+        topic: str, depth: int, search_engine: str, initial_state: Optional[dict], debug: bool) -> None:
     """Conduct deep research on a given topic and generate a PDF report"""
-    # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     state = initial_state or {}
     state["topic"] = topic
-    state = gather_information(topic, state, search_engine)
-    state = thinking(state)
+    # state = gather_information(topic, state, search_engine)
+    # state = thinking(state)
     # save_state_json(topic, state, timestamp)
     for _ in range(depth):
         state = deep_dive(state, search_engine)
         state = thinking(state)
-        # save_state_json(topic, state, timestamp)
+        if debug:
+            save_state_json(topic, state, timestamp)
     # state = create_outline(state)
     state = write_answer(state)
+    if debug:
+        save_state_json(topic, state, timestamp)
     return state["answer"]
     # state = write_report(state)
     # return state["report"]
@@ -396,6 +413,7 @@ def main() -> None:
                         help="Path to a JSON file to resume state from")
     parser.add_argument("--search_engine", type=str, default="duckduckgo",
                         help="The search engine to use, either DuckDuckGo or Tavily.")
+    parser.add_argument("--debug", type=bool, default=False, help="Run in debug mode")
     args = parser.parse_args()
 
     initial_state: Optional[dict] = None
@@ -408,7 +426,7 @@ def main() -> None:
             logger.error(
                 f"Failed to load resume state from {args.resume}: {e}")
 
-    deep_research(args.topic, args.depth, args.search_engine, initial_state)
+    deep_research(args.topic, args.depth, args.search_engine, initial_state, args.debug)
 
 
 if __name__ == "__main__":

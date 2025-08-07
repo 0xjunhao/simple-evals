@@ -1,9 +1,3 @@
-# ⚠️ Deprecation Notice
-
-**July 2025**: `simple-evals` will no longer be updated for new models or benchmark results. The repo will continue to host reference implementations for **HealthBench**, **BrowseComp**, and **SimpleQA**.
-
----
-
 # Overview
 This repository contains a lightweight library for evaluating language models.
 We are open sourcing it so we can be transparent about the accuracy numbers we're publishing alongside our latest models.
@@ -63,13 +57,6 @@ These approaches are carryovers from evaluating *base models* (rather than instr
 
 For this library, we are emphasizing the *zero-shot, chain-of-thought* setting, with simple instructions like "Solve the following multiple choice problem". We believe that this prompting technique is a better reflection of the models' performance in realistic usage.
 
-**We will not be actively maintaining this repository and monitoring PRs and Issues.** In particular, we're not accepting new evals. Here are the changes we might accept.
-- Bug fixes (hopefully not needed!)
-- Adding adapters for new models
-- Adding new rows to the table below with eval results, given new models and new system prompts.
-
-This repository is NOT intended as a replacement for https://github.com/openai/evals, which is designed to be a comprehensive collection of a large number of evals.
-
 ## Evals
 
 This repository currently contains the following evals:
@@ -95,35 +82,30 @@ Make sure to set the `*_API_KEY` environment variables before using these APIs.
 
 ## Setup
 
-Due to the optional dependencies, we're not providing a unified setup mechanism. Instead, we're providing instructions for each eval and sampler.
-
-For [HumanEval](https://github.com/openai/human-eval/) (python programming)
+Clone the repository, then install the requirements from the project root directory:
 ```bash
-git clone https://github.com/openai/human-eval
-pip install -e human-eval
-```
-
-For the [OpenAI API](https://pypi.org/project/openai/):
-```bash
-pip install openai
-```
-
-For the [Anthropic API](https://docs.anthropic.com/claude/docs/quickstart-guide):
-```bash
-pip install anthropic
+pip3 install -r requirements.txt
 ```
 
 ## Running the evals
+
 ```bash
-python -m simple-evals.simple_evals --list-models
+python3 -m simple-evals-continue.simple_evals --list-models
 ```
 This will list all the models that you can evaluate.
 
+```bash
+python3 -m simple-evals-continue.simple_evals --list-evals
+```
+This will list all the evals that you can evaluate.
+
 To run the evaluations, you can use the following command:
 ```bash
-python -m simple-evals.simple_evals --model <model_name> --examples <num_examples>
+python3 -m simple-evals-continue.simple_evals --model <model_name> --examples <num_examples>
 ```
 This will launch evaluations through the OpenAI API.
+
+When running commands, make sure you are not inside the project root directory, as Python module imports require running from outside the package folder.
 
 ## Notes
 

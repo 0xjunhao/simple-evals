@@ -5,7 +5,7 @@ from typing import Any
 import openai
 from openai import OpenAI
 
-from ..types import MessageList, SamplerBase, SamplerResponse
+from ..custom_types import MessageList, SamplerBase, SamplerResponse
 
 
 class ResponsesSampler(SamplerBase):
@@ -23,8 +23,8 @@ class ResponsesSampler(SamplerBase):
         reasoning_effort: str | None = None,
     ):
         self.api_key_name = "OPENAI_API_KEY"
-        assert os.environ.get("OPENAI_API_KEY"), "Please set OPENAI_API_KEY"
-        self.client = OpenAI()
+        self.api_key = os.environ.get(self.api_key_name) or "NA"
+        self.client = OpenAI(api_key=self.api_key)
         self.model = model
         self.system_message = system_message
         self.temperature = temperature

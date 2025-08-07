@@ -1,10 +1,11 @@
+import os
 import time
 from typing import Any
 
 import openai
 from openai import OpenAI
 
-from ..types import MessageList, SamplerBase, SamplerResponse
+from ..custom_types import MessageList, SamplerBase, SamplerResponse
 
 OPENAI_SYSTEM_MESSAGE_API = "You are a helpful assistant."
 OPENAI_SYSTEM_MESSAGE_CHATGPT = (
@@ -26,8 +27,8 @@ class ChatCompletionSampler(SamplerBase):
         max_tokens: int = 1024,
     ):
         self.api_key_name = "OPENAI_API_KEY"
-        self.client = OpenAI()
-        # using api_key=os.environ.get("OPENAI_API_KEY")  # please set your API_KEY
+        self.api_key = os.environ.get(self.api_key_name) or "NA"
+        self.client = OpenAI(api_key=self.api_key)
         self.model = model
         self.system_message = system_message
         self.temperature = temperature

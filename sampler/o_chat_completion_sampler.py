@@ -1,10 +1,11 @@
+import os
 import time
 from typing import Any
 
 import openai
 from openai import OpenAI
 
-from ..types import MessageList, SamplerBase, SamplerResponse
+from ..custom_types import MessageList, SamplerBase, SamplerResponse
 
 
 class OChatCompletionSampler(SamplerBase):
@@ -19,8 +20,8 @@ class OChatCompletionSampler(SamplerBase):
         model: str = "o1-mini",
     ):
         self.api_key_name = "OPENAI_API_KEY"
-        self.client = OpenAI()
-        # using api_key=os.environ.get("OPENAI_API_KEY")  # please set your API_KEY
+        self.api_key = os.environ.get(self.api_key_name) or "NA"
+        self.client = OpenAI(api_key=self.api_key)
         self.model = model
         self.image_format = "url"
         self.reasoning_effort = reasoning_effort

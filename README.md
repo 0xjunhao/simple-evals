@@ -119,6 +119,3 @@ When running commands, make sure you are not inside the project root directory, 
 [^8]:Includes an answer regex tweak for GPQA benchmark.
 [^9]:The default reasoning level for o3-mini is "medium".
 [^10]:These results are with no tools enabled for o3 or o4-mini
-
-## Legal Stuff
-By contributing to evals, you are agreeing to make your evaluation logic and data under the same MIT license as this repository. You must have adequate rights to upload any data used in an eval. OpenAI reserves the right to use this data in future service improvements to our product. Contributions to OpenAI evals will be subject to our usual Usage Policies: https://platform.openai.com/docs/usage-policies.

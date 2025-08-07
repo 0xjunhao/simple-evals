@@ -39,6 +39,9 @@ def main():
         help="Select a model by name. Also accepts a comma-separated list of models.",
     )
     parser.add_argument(
+        "--list-evals", action="store_true", help="List available evals"
+    )
+    parser.add_argument(
         "--eval",
         type=str,
         help="Select an eval by name. Also accepts a comma-separated list of evals.",
@@ -55,7 +58,8 @@ def main():
         default=120,
         help="Number of threads to run. Only supported for HealthBench and HealthBenchMeta.",
     )
-    parser.add_argument("--debug", action="store_true", help="Run in debug mode")
+    parser.add_argument("--debug", action="store_true",
+                        help="Run in debug mode")
     parser.add_argument(
         "--examples", type=int, help="Number of examples to use (overrides default)"
     )
@@ -247,7 +251,8 @@ def main():
             if model_name not in models:
                 print(f"Error: Model '{model_name}' not found.")
                 return
-        models = {model_name: models[model_name] for model_name in models_chosen}
+        models = {model_name: models[model_name]
+                  for model_name in models_chosen}
 
     print(f"Running with args {args}")
 
@@ -261,7 +266,8 @@ def main():
 
     def get_evals(eval_name, debug_mode):
         num_examples = (
-            args.examples if args.examples is not None else (5 if debug_mode else None)
+            args.examples if args.examples is not None else (
+                5 if debug_mode else None)
         )
         # Set num_examples = None to reproduce full evals
         match eval_name:
@@ -333,6 +339,26 @@ def main():
             case _:
                 raise Exception(f"Unrecognized eval type: {eval_name}")
 
+    SUPPORTED_EVALS = [
+        "mmlu",
+        "math",
+        "gpqa",
+        "mgsm",
+        "drop",
+        "humaneval",
+        "simpleqa",
+        "browsecomp",
+        "healthbench",
+        "healthbench_hard",
+        "healthbench_consensus",
+        "healthbench_meta",
+    ]
+    if args.list_evals:
+        print("Available evals:")
+        for eval_name in SUPPORTED_EVALS:
+            print(f" - {eval_name}")
+        return
+
     if args.eval:
         evals_list = args.eval.split(",")
         evals = {}
@@ -345,20 +371,7 @@ def main():
     else:
         evals = {
             eval_name: get_evals(eval_name, args.debug)
-            for eval_name in [
-                "mmlu",
-                "math",
-                "gpqa",
-                "mgsm",
-                "drop",
-                "humaneval",
-                "simpleqa",
-                "browsecomp",
-                "healthbench",
-                "healthbench_hard",
-                "healthbench_consensus",
-                "healthbench_meta",
-            ]
+            for eval_name in SUPPORTED_EVALS
         }
 
     print(evals)
@@ -413,7 +426,7 @@ def main():
             continue
         result = result.get("f1_score", result.get("score", None))
         eval_name = eval_model_name[: eval_model_name.find("_")]
-        model_name = eval_model_name[eval_model_name.find("_") + 1 :]
+        model_name = eval_model_name[eval_model_name.find("_") + 1:]
         merge_metrics.append(
             {"eval_name": eval_name, "model_name": model_name, "metric": result}
         )

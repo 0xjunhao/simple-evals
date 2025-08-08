@@ -21,6 +21,8 @@ class SamplerBase:
     or used as part of the grading process.
     """
 
+    UNAVAILABLE_API_KEY: str = "UNAVAILABLE"
+
     def __call__(
         self, 
         message_list: MessageList,

@@ -2,6 +2,7 @@ import argparse
 import json
 import subprocess
 from datetime import datetime
+import urllib.parse
 
 import pandas as pd
 
@@ -19,6 +20,10 @@ from .sampler.chat_completion_sampler import (
     OPENAI_SYSTEM_MESSAGE_API,
     OPENAI_SYSTEM_MESSAGE_CHATGPT,
     ChatCompletionSampler,
+)
+from .sampler.openrouter_chat_completion_sampler import (
+    OPENROUTER_SYSTEM_MESSAGE_API,
+    OpenRouterChatCompletionSampler
 )
 from .sampler.claude_sampler import ClaudeCompletionSampler, CLAUDE_SYSTEM_MESSAGE_LMSYS
 from .sampler.o_chat_completion_sampler import OChatCompletionSampler
@@ -45,6 +50,12 @@ def main():
         "--eval",
         type=str,
         help="Select an eval by name. Also accepts a comma-separated list of evals.",
+    )
+    parser.add_argument(
+        "--grading-model", type=str, help="Select a grading model by name."
+    )
+    parser.add_argument(
+        "--equality-checking-model", type=str, help="Select an equality checking model by name."
     )
     parser.add_argument(
         "--n-repeats",
@@ -237,6 +248,11 @@ def main():
         "claude-3-haiku-20240307": ClaudeCompletionSampler(
             model="claude-3-haiku-20240307",
         ),
+        # OpenRouter models:
+        "openai/gpt-oss-20b": OpenRouterChatCompletionSampler(
+            model="openai/gpt-oss-20b",
+            system_message=OPENROUTER_SYSTEM_MESSAGE_API,
+        )
     }
 
     if args.list_models:
@@ -256,23 +272,23 @@ def main():
 
     print(f"Running with args {args}")
 
-    grading_sampler = ChatCompletionSampler(
-        model="gpt-4.1-2025-04-14",
-        system_message=OPENAI_SYSTEM_MESSAGE_API,
-        max_tokens=2048,
-    )
-    equality_checker = ChatCompletionSampler(model="gpt-4-turbo-preview")
+    grading_model = args.grading_model or (
+        "openai/gpt-oss-20b" if args.debug else "openai/gpt-oss-200b")
+    grading_sampler = models[grading_model]
+    equality_checking_model = args.equality_checking_model or (
+        "openai/gpt-oss-20b" if args.debug else "openai/gpt-oss-200b")
+    equality_checker = models[equality_checking_model]
     # ^^^ used for fuzzy matching, just for math
 
     def get_evals(eval_name, debug_mode):
         num_examples = (
             args.examples if args.examples is not None else (
-                5 if debug_mode else None)
+                10 if debug_mode else None)
         )
         # Set num_examples = None to reproduce full evals
         match eval_name:
             case "mmlu":
-                return MMLUEval(num_examples=1 if debug_mode else num_examples)
+                return MMLUEval(num_examples)
             case "math":
                 return MathEval(
                     equality_checker=equality_checker,
@@ -387,7 +403,7 @@ def main():
         for eval_name, eval_obj in evals.items():
             result = eval_obj(sampler)
             # ^^^ how to use a sampler
-            file_stem = f"{eval_name}_{model_name}"
+            file_stem = f"{eval_name}_{urllib.parse.quote(model_name, safe='')}"
             # file stem should also include the year, month, day, and time in hours and minutes
             file_stem += f"_{date_str}"
             report_filename = f"/tmp/{file_stem}{debug_suffix}.html"
@@ -426,7 +442,7 @@ def main():
             continue
         result = result.get("f1_score", result.get("score", None))
         eval_name = eval_model_name[: eval_model_name.find("_")]
-        model_name = eval_model_name[eval_model_name.find("_") + 1:]
+        model_name = urllib.parse.unquote(eval_model_name[eval_model_name.find("_") + 1:])
         merge_metrics.append(
             {"eval_name": eval_name, "model_name": model_name, "metric": result}
         )

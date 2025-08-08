@@ -22,8 +22,7 @@ class ResponsesSampler(SamplerBase):
         reasoning_model: bool = False,
         reasoning_effort: str | None = None,
     ):
-        self.api_key_name = "OPENAI_API_KEY"
-        self.api_key = os.environ.get(self.api_key_name) or "NA"
+        self.api_key = os.environ.get("OPENAI_API_KEY") or SamplerBase.UNAVAILABLE_API_KEY
         self.client = OpenAI(api_key=self.api_key)
         self.model = model
         self.system_message = system_message

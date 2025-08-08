@@ -7,23 +7,28 @@ from openai import OpenAI
 
 from ..custom_types import MessageList, SamplerBase, SamplerResponse
 
+OPENROUTER_SYSTEM_MESSAGE_API = "You are a helpful assistant."
 
-class OChatCompletionSampler(SamplerBase):
+
+class OpenRouterChatCompletionSampler(SamplerBase):
     """
-    Sample from OpenAI's chat completion API for o series models
+    Sample from OpenRouter's chat completion API
     """
 
     def __init__(
         self,
-        *,
-        reasoning_effort: str | None = None,
-        model: str = "o1-mini",
+        model: str = "openai/gpt-oss-20b",
+        system_message: str | None = None,
+        temperature: float = 0.5,
+        max_tokens: int = 1024,
     ):
-        self.api_key = os.environ.get("OPENAI_API_KEY") or SamplerBase.UNAVAILABLE_API_KEY
-        self.client = OpenAI(api_key=self.api_key)
+        self.api_key = os.environ.get("OPENROUTER_API_KEY") or SamplerBase.UNAVAILABLE_API_KEY
+        self.client = OpenAI(api_key=self.api_key, base_url="https://openrouter.ai/api/v1")
         self.model = model
+        self.system_message = system_message
+        self.temperature = temperature
+        self.max_tokens = max_tokens
         self.image_format = "url"
-        self.reasoning_effort = reasoning_effort
 
     def _handle_image(
         self,
@@ -47,15 +52,23 @@ class OChatCompletionSampler(SamplerBase):
         return {"role": str(role), "content": content}
 
     def __call__(self, message_list: MessageList) -> SamplerResponse:
+        if self.system_message:
+            message_list = [
+                self._pack_message("system", self.system_message)
+            ] + message_list
         trial = 0
         while True:
             try:
                 response = self.client.chat.completions.create(
                     model=self.model,
                     messages=message_list,
-                    reasoning_effort=self.reasoning_effort,
+                    temperature=self.temperature,
+                    max_tokens=self.max_tokens,
                 )
                 content = response.choices[0].message.content
+                if content is None:
+                    raise ValueError(
+                        "OpenAI API returned empty response; retrying")
                 return SamplerResponse(
                     response_text=content,
                     response_metadata={"usage": response.usage},
@@ -65,7 +78,7 @@ class OChatCompletionSampler(SamplerBase):
             except openai.BadRequestError as e:
                 print("Bad Request Error", e)
                 return SamplerResponse(
-                    response_text="",
+                    response_text="No response (bad request).",
                     response_metadata={"usage": None},
                     actual_queried_message_list=message_list,
                 )

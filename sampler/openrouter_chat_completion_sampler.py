@@ -1,9 +1,8 @@
 import os
+import requests
 import time
 from typing import Any
 
-import openai
-from openai import OpenAI
 
 from ..custom_types import MessageList, SamplerBase, SamplerResponse
 
@@ -18,12 +17,20 @@ class OpenRouterChatCompletionSampler(SamplerBase):
     def __init__(
         self,
         model: str = "openai/gpt-oss-20b",
+        provider: str | None = None,
         system_message: str | None = None,
         temperature: float = 0.5,
         max_tokens: int = 1024,
     ):
-        self.api_key = os.environ.get("OPENROUTER_API_KEY") or SamplerBase.UNAVAILABLE_API_KEY
-        self.client = OpenAI(api_key=self.api_key, base_url="https://openrouter.ai/api/v1")
+        self.api_key = os.environ.get("OPENROUTER_API_KEY")
+        if not self.api_key:
+            raise Exception(
+                "OPENROUTER_API_KEY environment variable is not set.")
+        self.headers = {
+            'Authorization': f'Bearer {self.api_key}',
+            'Content-Type': 'application/json',
+        }
+        self.provider = provider
         self.model = model
         self.system_message = system_message
         self.temperature = temperature
@@ -59,27 +66,30 @@ class OpenRouterChatCompletionSampler(SamplerBase):
         trial = 0
         while True:
             try:
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=message_list,
-                    temperature=self.temperature,
-                    max_tokens=self.max_tokens,
-                )
-                content = response.choices[0].message.content
+                request = {
+                    'model': self.model,
+                    'messages': message_list,
+                    'temperature': self.temperature,
+                    'max_tokens': self.max_tokens
+                }
+                if self.provider:
+                    request['provider'] = {
+                        'order': [
+                            self.provider
+                        ],
+                        'allow_fallbacks': False
+                    }
+                response = requests.post('https://openrouter.ai/api/v1/chat/completions',
+                                         headers=self.headers, json=request)
+                print(response.json())
+                content = response.json().get('choices', [{}])[
+                    0].get('message', {}).get('content')
                 if content is None:
-                    raise ValueError(
-                        "OpenAI API returned empty response; retrying")
+                    raise Exception(
+                        "OpenRouter API returned empty response; retrying")
                 return SamplerResponse(
                     response_text=content,
-                    response_metadata={"usage": response.usage},
-                    actual_queried_message_list=message_list,
-                )
-            # NOTE: BadRequestError is triggered once for MMMU, please uncomment if you are reruning MMMU
-            except openai.BadRequestError as e:
-                print("Bad Request Error", e)
-                return SamplerResponse(
-                    response_text="No response (bad request).",
-                    response_metadata={"usage": None},
+                    response_metadata={"usage": response.json().get('usage')},
                     actual_queried_message_list=message_list,
                 )
             except Exception as e:

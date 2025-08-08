@@ -66,10 +66,6 @@ def main():
         return
     if args.model:
         models_chosen = args.model.split(",")
-        for model_name in models_chosen:
-            if model_name not in ModelBuilder.SUPPORTED_MODELS:
-                print(f"Error: Model '{model_name}' not found.")
-                return
         models = {model_name: model_builder.build(model_name)
                   for model_name in models_chosen}
 

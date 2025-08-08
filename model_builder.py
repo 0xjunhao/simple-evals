@@ -266,5 +266,45 @@ class ModelBuilder:
                     model="openai/gpt-oss-20b",
                     system_message=OPENROUTER_SYSTEM_MESSAGE_API,
                 )
+            case "openai/gpt-oss-200b":
+                return OpenRouterChatCompletionSampler(
+                    model="openai/gpt-oss-200b",
+                    system_message=OPENROUTER_SYSTEM_MESSAGE_API,
+                )
+            case "qwen/qwen3-coder_chutes/fp8":
+                return OpenRouterChatCompletionSampler(
+                    model="qwen/qwen3-coder",
+                    provider="chutes/fp8",
+                )
+            case "qwen/qwen3-coder_chutes":
+                return OpenRouterChatCompletionSampler(
+                    model="qwen/qwen3-coder",
+                    provider="chutes",
+                )
+            case "qwen/qwen3-coder_targon/fp8":
+                return OpenRouterChatCompletionSampler(
+                    model="qwen/qwen3-coder",
+                    provider="baseten/fp8",
+                )
+            case "qwen/qwen3-coder_targon/fp8":
+                return OpenRouterChatCompletionSampler(
+                    model="qwen/qwen3-coder",
+                    provider="targon/fp8",
+                )
+            case "qwen/qwen3-coder_phala":
+                return OpenRouterChatCompletionSampler(
+                    model="qwen/qwen3-coder",
+                    provider="phala",
+                )
+            case "qwen/qwen3-coder_together/fp8":
+                return OpenRouterChatCompletionSampler(
+                    model="qwen/qwen3-coder",
+                    provider="together/fp8",
+                )
+            case "qwen/qwen3-coder_hyperbolic/fp8":
+                return OpenRouterChatCompletionSampler(
+                    model="qwen/qwen3-coder",
+                    provider="hyperbolic/fp8",
+                )
             case _:
                 raise Exception(f"Unsupported model name: {model_name}")

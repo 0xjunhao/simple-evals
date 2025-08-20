@@ -1,3 +1,4 @@
+from .evals.swebench_lite_eval import SWEBenchLiteEval
 from .evals.browsecomp_eval import BrowseCompEval
 from .evals.drop_eval import DropEval
 from .evals.gpqa_eval import GPQAEval
@@ -25,6 +26,7 @@ class EvalBuilder:
         "healthbench_hard",
         "healthbench_consensus",
         "healthbench_meta",
+        "swebench_verified"
     ]
 
     def __init__(self, args, equality_checker, grading_sampler):
@@ -39,8 +41,8 @@ class EvalBuilder:
         debug_mode = args.debug
         num_examples = (
             args.examples if args.examples is not None else (
-                10 if debug_mode else None)
-        )        # Set num_examples = None to reproduce full evals
+                5 if debug_mode else None)
+        )
         match eval_name:
             case "mmlu":
                 return MMLUEval(num_examples)
@@ -106,6 +108,10 @@ class EvalBuilder:
                     num_examples=10 if debug_mode else num_examples,
                     n_repeats=args.n_repeats or 1,
                     n_threads=args.n_threads or 1,
+                )
+            case "swebench_lite":
+                return SWEBenchLiteEval(
+                    num_examples=num_examples,
                 )
             case _:
                 raise Exception(f"Unrecognized eval type: {eval_name}")

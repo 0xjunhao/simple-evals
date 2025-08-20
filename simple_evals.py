@@ -86,11 +86,7 @@ def main():
         evals_list = args.eval.split(",")
         evals = {}
         for eval_name in evals_list:
-            try:
-                evals[eval_name] = eval_builder.build(eval_name)
-            except Exception:
-                print(f"Error: eval '{eval_name}' not found.")
-                return
+            evals[eval_name] = eval_builder.build(eval_name)
     else:
         evals = {
             eval_name: eval_builder.build(eval_name)

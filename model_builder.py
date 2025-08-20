@@ -138,6 +138,11 @@ class ModelBuilder:
                     model="o3-mini",
                     reasoning_effort="low",
                 )
+            # GPT-5 models
+            case "gpt-5-mini":
+                return OChatCompletionSampler(
+                    model="gpt-5-mini-2025-08-07"
+                )
             # GPT-4.1 models
             case "gpt-4.1":
                 return ChatCompletionSampler(
@@ -271,37 +276,37 @@ class ModelBuilder:
                     model="openai/gpt-oss-200b",
                     system_message=OPENROUTER_SYSTEM_MESSAGE_API,
                 )
-            case "qwen/qwen3-coder_chutes/fp8":
+            case "qwen3-coder_chutes/fp8":
                 return OpenRouterChatCompletionSampler(
                     model="qwen/qwen3-coder",
                     provider="chutes/fp8",
                 )
-            case "qwen/qwen3-coder_chutes":
+            case "qwen3-coder_chutes":
                 return OpenRouterChatCompletionSampler(
                     model="qwen/qwen3-coder",
                     provider="chutes",
                 )
-            case "qwen/qwen3-coder_targon/fp8":
+            case "qwen3-coder_targon/fp8":
                 return OpenRouterChatCompletionSampler(
                     model="qwen/qwen3-coder",
                     provider="baseten/fp8",
                 )
-            case "qwen/qwen3-coder_targon/fp8":
+            case "qwen3-coder_targon/fp8":
                 return OpenRouterChatCompletionSampler(
                     model="qwen/qwen3-coder",
                     provider="targon/fp8",
                 )
-            case "qwen/qwen3-coder_phala":
+            case "qwen3-coder_phala":
                 return OpenRouterChatCompletionSampler(
                     model="qwen/qwen3-coder",
                     provider="phala",
                 )
-            case "qwen/qwen3-coder_together/fp8":
+            case "qwen3-coder_together/fp8":
                 return OpenRouterChatCompletionSampler(
                     model="qwen/qwen3-coder",
                     provider="together/fp8",
                 )
-            case "qwen/qwen3-coder_hyperbolic/fp8":
+            case "qwen3-coder_hyperbolic/fp8":
                 return OpenRouterChatCompletionSampler(
                     model="qwen/qwen3-coder",
                     provider="hyperbolic/fp8",

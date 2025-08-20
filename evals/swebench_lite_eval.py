@@ -17,6 +17,7 @@ from datasets import load_dataset
 import docker
 import json
 from pathlib import Path, PurePosixPath
+import os
 import random
 import traceback
 import uuid
@@ -63,8 +64,9 @@ class SWEBenchLiteEval(Eval):
     def grade_sample(self, row: dict, patch_text: str) -> str:
         instance_id = row.get(KEY_INSTANCE_ID)
         run_id = str(uuid.uuid4())
+        namespace = "swebench" if hasattr(os, "uname") and os.uname().sysname == "Linux" else None
         test_spec = make_test_spec(
-            row, namespace=None, instance_image_tag="latest")
+            row, namespace=namespace, instance_image_tag="latest")
         # Write prediction dict matching harness expectations
         pred = {
             KEY_INSTANCE_ID: instance_id,

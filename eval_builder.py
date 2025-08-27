@@ -1,3 +1,4 @@
+from .evals.mmlu_tr_eval import MMLUTrEval
 from .evals.swebench_lite_eval import SWEBenchLiteEval
 from .evals.browsecomp_eval import BrowseCompEval
 from .evals.drop_eval import DropEval
@@ -26,7 +27,8 @@ class EvalBuilder:
         "healthbench_hard",
         "healthbench_consensus",
         "healthbench_meta",
-        "swebench_verified"
+        "swebench_verified",
+        "mmlu_tr",
     ]
 
     def __init__(self, args, equality_checker, grading_sampler):
@@ -113,5 +115,7 @@ class EvalBuilder:
                 return SWEBenchLiteEval(
                     num_examples=num_examples,
                 )
+            case "mmlu_tr":
+                return MMLUTrEval(num_examples)
             case _:
                 raise Exception(f"Unrecognized eval type: {eval_name}")
